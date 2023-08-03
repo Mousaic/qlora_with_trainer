@@ -4,6 +4,8 @@
 from dataclasses import dataclass, field
 from typing import Optional
 import transformers
+import argparse
+
 
 IGNORE_INDEX = -100
 DEFAULT_PAD_TOKEN = "[PAD]"
@@ -175,4 +177,16 @@ class GenerationArguments:
     repetition_penalty: Optional[float] = field(default=1.0) 
     length_penalty: Optional[float] = field(default=1.0)
     no_repeat_ngram_size: Optional[int] = field(default=0) 
+
+
+
+
+hfparser = transformers.HfArgumentParser((
+        ModelArguments, DataArguments, TrainingArguments, GenerationArguments))
+
+model_args, data_args, training_args, generation_args, extra_args = \
+        hfparser.parse_args_into_dataclasses(return_remaining_strings=True)
+    
+training_args.generation_config = transformers.GenerationConfig(**vars(generation_args))
+args = argparse.Namespace(**vars(model_args), **vars(data_args), **vars(training_args))
 
